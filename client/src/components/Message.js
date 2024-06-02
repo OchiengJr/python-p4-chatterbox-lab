@@ -13,9 +13,17 @@ function Message({ message, currentUser, onMessageDelete, onUpdateMessage }) {
   function handleDeleteClick() {
     fetch(`http://127.0.0.1:4000/messages/${id}`, {
       method: "DELETE",
+    }).then(() => {
+      onMessageDelete(id);
     });
+  }
 
-    onMessageDelete(id);
+  function handleEditClick() {
+    setIsEditing(true);
+  }
+
+  function handleCancelEdit() {
+    setIsEditing(false);
   }
 
   function handleUpdateMessage(updatedMessage) {
@@ -32,13 +40,14 @@ function Message({ message, currentUser, onMessageDelete, onUpdateMessage }) {
           id={id}
           body={body}
           onUpdateMessage={handleUpdateMessage}
+          onCancelEdit={handleCancelEdit}
         />
       ) : (
         <p>{body}</p>
       )}
-      {isCurrentUser ? (
+      {isCurrentUser && !isEditing && (
         <div className="actions">
-          <button onClick={() => setIsEditing((isEditing) => !isEditing)}>
+          <button onClick={handleEditClick}>
             <span role="img" aria-label="edit">
               ✏️
             </span>
@@ -49,7 +58,7 @@ function Message({ message, currentUser, onMessageDelete, onUpdateMessage }) {
             </span>
           </button>
         </div>
-      ) : null}
+      )}
     </li>
   );
 }

@@ -1,12 +1,7 @@
 import React from "react";
 import Message from "./Message";
 
-function MessageList({
-  messages,
-  currentUser,
-  onMessageDelete,
-  onUpdateMessage,
-}) {
+function MessageList({ messages, currentUser, onMessageDelete, onUpdateMessage }) {
   return (
     <div className="list">
       <ul>
@@ -20,6 +15,7 @@ function MessageList({
           />
         ))}
       </ul>
+      {messages.length === 0 && <p>No messages found.</p>}
     </div>
   );
 }

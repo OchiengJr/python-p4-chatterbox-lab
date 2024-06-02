@@ -2,9 +2,12 @@ import React, { useState } from "react";
 
 function EditMessage({ id, body, onUpdateMessage }) {
   const [messageBody, setMessageBody] = useState(body);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   function handleFormSubmit(e) {
     e.preventDefault();
+    setIsSubmitting(true);
 
     fetch(`http://127.0.0.1:4000/messages/${id}`, {
       method: "PATCH",
@@ -15,8 +18,20 @@ function EditMessage({ id, body, onUpdateMessage }) {
         body: messageBody,
       }),
     })
-      .then((r) => r.json())
-      .then((updatedMessage) => onUpdateMessage(updatedMessage));
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error("Failed to update message");
+        }
+        return r.json();
+      })
+      .then((updatedMessage) => {
+        onUpdateMessage(updatedMessage);
+        setIsSubmitting(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setIsSubmitting(false);
+      });
   }
 
   return (
@@ -27,8 +42,12 @@ function EditMessage({ id, body, onUpdateMessage }) {
         autoComplete="off"
         value={messageBody}
         onChange={(e) => setMessageBody(e.target.value)}
+        disabled={isSubmitting}
       />
-      <input type="submit" value="Save" />
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save"}
+      </button>
+      {error && <div className="error-message">{error}</div>}
     </form>
   );
 }
